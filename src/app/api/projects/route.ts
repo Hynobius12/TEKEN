@@ -9,7 +9,7 @@ const generateShortId = () => crypto.randomBytes(6).toString('hex');
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { projectName, clientName, description, driveLink } = body;
+    const { projectName, clientName, description, driveLink, userId } = body;
 
     // Validasi data
     if (!projectName || !clientName || !description || !driveLink) {
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         description,
         driveLink,
         status: 'PENDING',
+        userId: userId || null,
       },
     });
 
@@ -50,9 +51,15 @@ export async function POST(request: Request) {
 }
 
 // [GET] Mengambil semua proyek untuk Dashboard Freelancer
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    const whereClause = userId ? { userId } : {};
+
     const projects = await prisma.project.findMany({
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
       include: { securityLog: true }
     });

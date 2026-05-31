@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { 
   Plus, 
@@ -11,7 +12,9 @@ import {
   ExternalLink,
   Search,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Edit2,
+  X
 } from 'lucide-react';
 
 interface Project {
@@ -25,6 +28,9 @@ interface Project {
 }
 
 export default function Dashboard() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+
   // State
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +38,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   
   // Form State
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState('');
   const [clientName, setClientName] = useState('');
   const [description, setDescription] = useState('');
@@ -43,9 +50,9 @@ export default function Dashboard() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Fetch Projects
-  const fetchProjects = async () => {
+  const fetchProjects = async (userId: string) => {
     try {
-      const res = await fetch('/api/projects');
+      const res = await fetch(`/api/projects?userId=${userId}`);
       if (res.ok) {
         const data = await res.json();
         setProjects(data);
@@ -58,8 +65,15 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    const userStr = localStorage.getItem('teken_user');
+    if (!userStr) {
+      router.push('/login');
+      return;
+    }
+    const userData = JSON.parse(userStr);
+    setUser(userData);
+    fetchProjects(userData.id);
+  }, [router]);
 
   // Form Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,37 +95,68 @@ export default function Dashboard() {
     setSubmitting(true);
 
     try {
-      const res = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          projectName,
-          clientName,
-          description,
-          driveLink,
-        }),
-      });
+      let res;
+      if (editingProjectId) {
+        res = await fetch(`/api/projects/${editingProjectId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectName,
+            clientName,
+            description,
+            driveLink,
+            userId: user?.id,
+          }),
+        });
+      } else {
+        res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            projectName,
+            clientName,
+            description,
+            driveLink,
+            userId: user?.id,
+          }),
+        });
+      }
 
       if (res.ok) {
         setFormSuccess(true);
         // Reset form
-        setProjectName('');
-        setClientName('');
-        setDescription('');
-        setDriveLink('');
+        handleCancelEdit();
         // Refresh project list
-        fetchProjects();
+        if (user) fetchProjects(user.id);
       } else {
         const errData = await res.json();
-        setFormError(errData.error || 'Gagal menambahkan proyek baru.');
+        setFormError(errData.error || (editingProjectId ? 'Gagal memperbarui draf.' : 'Gagal menambahkan proyek baru.'));
       }
     } catch (err) {
       setFormError('Terjadi kesalahan jaringan. Silakan coba lagi.');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleEditDraft = (project: Project) => {
+    setEditingProjectId(project.id);
+    setProjectName(project.projectName);
+    setClientName(project.clientName);
+    setDescription(project.description);
+    setDriveLink(project.driveLink);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProjectId(null);
+    setProjectName('');
+    setClientName('');
+    setDescription('');
+    setDriveLink('');
+    setFormError('');
   };
 
   // Copy Clipboard Handler
@@ -162,11 +207,14 @@ export default function Dashboard() {
             <div className="lg:col-span-1">
               <div className="glass-card p-6 bg-white sticky top-24">
                 <h2 className="text-lg font-bold text-[var(--color-brand-navy)] mb-4 flex items-center gap-2">
-                  <Plus className="h-5 w-5" />
-                  Buat Serah Terima Baru
+                  {editingProjectId ? (
+                    <><Edit2 className="h-5 w-5" /> Edit Draf Proyek</>
+                  ) : (
+                    <><Plus className="h-5 w-5" /> Buat Serah Terima Baru</>
+                  )}
                 </h2>
                 <p className="text-xs text-[var(--color-text-secondary)] mb-6">
-                  Masukkan data aset final yang ingin Anda serahkan kepada klien.
+                  {editingProjectId ? 'Ubah detail proyek sebelum disetujui klien.' : 'Masukkan data aset final yang ingin Anda serahkan kepada klien.'}
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -236,17 +284,30 @@ export default function Dashboard() {
                   {formSuccess && (
                     <div className="flex items-center gap-2 text-xs text-[var(--color-success-emerald)] bg-[var(--color-success-bg)] border border-[var(--color-success-border)] p-3 rounded">
                       <CheckCircle className="h-4 w-4 shrink-0" />
-                      <span>Proyek baru berhasil didaftarkan! Link verifikasi siap disalin.</span>
+                      <span>{editingProjectId ? 'Draf berhasil diperbarui!' : 'Proyek baru berhasil didaftarkan! Link verifikasi siap disalin.'}</span>
                     </div>
                   )}
 
-                  <button 
-                    type="submit" 
-                    disabled={submitting}
-                    className="btn-primary w-full justify-center mt-2 py-3"
-                  >
-                    {submitting ? 'Memproses...' : 'Daftarkan & Generate Draft BAST'}
-                  </button>
+                  <div className="flex gap-2 mt-2">
+                    <button 
+                      type="submit" 
+                      disabled={submitting}
+                      className="btn-primary flex-1 justify-center py-3"
+                    >
+                      {submitting ? 'Memproses...' : (editingProjectId ? 'Perbarui Draf' : 'Daftarkan & Generate Draft BAST')}
+                    </button>
+                    {editingProjectId && (
+                      <button 
+                        type="button" 
+                        onClick={handleCancelEdit}
+                        disabled={submitting}
+                        className="btn-secondary py-3 px-4 flex items-center justify-center"
+                        title="Batal Edit"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    )}
+                  </div>
                 </form>
               </div>
             </div>
@@ -318,6 +379,15 @@ export default function Dashboard() {
                             
                             {/* Action Buttons */}
                             <div className="flex items-center gap-2 self-end sm:self-auto">
+                              {!isApproved && (
+                                <button
+                                  onClick={() => handleEditDraft(project)}
+                                  className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5"
+                                >
+                                  <Edit2 className="h-3.5 w-3.5" />
+                                  Edit Draf
+                                </button>
+                              )}
                               <a 
                                 href={`/api/projects/${project.id}/pdf`}
                                 className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5"

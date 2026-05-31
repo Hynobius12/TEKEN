@@ -17,6 +17,8 @@ model Project {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   securityLog    SecurityLog? // Relasi one-to-one dengan log audit digital footprint
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id])
 }
 
 model SecurityLog {
@@ -28,4 +30,12 @@ model SecurityLog {
   timezone         String
   screenResolution String
   timestamp        DateTime @default(now())
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  name     String
+  projects Project[]
 }

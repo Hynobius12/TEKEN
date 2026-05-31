@@ -158,152 +158,232 @@ export default function VerifyClient() {
         </div>
 
         {/* Certified Card */}
-        <div className="glass-card bg-white overflow-hidden shadow-lg border border-[var(--color-border-subtle)]">
+        <div className="glass-card bg-white overflow-hidden shadow-lg border border-[var(--color-border-subtle)] animate-fade-in">
           
-          {/* Header Banner - Hijau jika disetujui, Biru Navy jika pending */}
+          {/* DYNAMIC VIEW BASED ON STATUS */}
           {isApproved ? (
-            <div className="certified-banner">
-              <ShieldCheck className="mx-auto h-12 w-12 text-white mb-2 animate-bounce" />
-              <h2 className="text-xl font-bold uppercase tracking-wide">Pekerjaan Selesai & Disetujui secara Sah</h2>
-              <p className="text-xs text-emerald-100 mt-1">
-                Tercatat pada Lembar Berita Acara Hukum Platform TEKEN • ID: {project.id.toUpperCase()}
-              </p>
-            </div>
-          ) : (
-            <div className="bg-[var(--color-brand-navy)] text-white p-6 text-center">
-              <Clock className="mx-auto h-12 w-12 text-blue-300 mb-2" />
-              <h2 className="text-xl font-bold uppercase tracking-wide">Konfirmasi Serah Terima Pekerjaan</h2>
-              <p className="text-xs text-slate-300 mt-1">
-                Harap tinjau pekerjaan di bawah sebelum melakukan tanda tangan elektronik implisit.
-              </p>
-            </div>
-          )}
-
-          <div className="p-6 sm:p-8 space-y-6">
-            
-            {/* Warning Banner / Summary */}
-            {!isApproved && (
-              <div className="flex gap-3 bg-[var(--color-brand-blue-light)] border border-blue-200 text-[var(--color-brand-blue)] p-4 rounded-lg text-xs leading-relaxed">
-                <Info className="h-5 w-5 shrink-0" />
-                <div>
-                  <strong>PENTING UNTUK KLIEN:</strong> Menekan tombol <strong>"Setuju & Selesaikan Proyek"</strong> di bagian bawah halaman ini merupakan wujud <strong>Tanda Tangan Elektronik Implisit yang Sah (UU ITE)</strong>. Setelah disetujui, data akan dikunci secara permanen, dan revisi di luar kesepakatan awal tidak dapat diajukan lagi secara gratis.
-                </div>
+            /* ==========================================
+               APPROVED VIEW: SERTIFIKAT KEASLIAN DIGITAL
+               ========================================== */
+            <>
+              {/* Banner Hijau Majestic */}
+              <div className="certified-banner bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-8 text-center border-b-4 border-emerald-600">
+                <ShieldCheck className="mx-auto h-16 w-16 text-white mb-3 animate-pulse" />
+                <h2 className="text-2xl font-black uppercase tracking-wide">Sertifikat Keaslian Dokumen Digital</h2>
+                <p className="text-xs text-emerald-100 mt-1.5 uppercase tracking-wider font-semibold">
+                  Bukti Kelayakan Hukum Terverifikasi • Platform TEKEN • ID: {project.id.toUpperCase()}
+                </p>
               </div>
-            )}
 
-            {/* Project Summary */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold uppercase text-[var(--color-text-secondary)] border-b border-[var(--color-border-subtle)] pb-2">
-                Detail Berita Acara Serah Terima (BAST)
-              </h3>
-
-              <div className="grid gap-4 sm:grid-cols-2 text-sm">
-                <div>
-                  <span className="block text-xs font-semibold text-[var(--color-text-muted)]">Nama Proyek</span>
-                  <span className="font-bold text-[var(--color-brand-navy)]">{project.projectName}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-[var(--color-text-muted)]">Pihak Kedua (Klien)</span>
-                  <span className="font-bold text-[var(--color-brand-navy)]">{project.clientName}</span>
-                </div>
-                <div className="sm:col-span-2">
-                  <span className="block text-xs font-semibold text-[var(--color-text-muted)]">Deskripsi Serah Terima Pekerjaan</span>
-                  <p className="text-xs text-[var(--color-text-secondary)] bg-[var(--color-bg-base)] p-3 rounded border border-[var(--color-border-subtle)] mt-1 whitespace-pre-line leading-relaxed">
-                    {project.description}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Aset Final Link */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-bold uppercase text-[var(--color-text-secondary)] border-b border-[var(--color-border-subtle)] pb-2">
-                Aset Final Pekerjaan
-              </h3>
-              
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-[var(--color-bg-base)] border border-[var(--color-border-subtle)] p-4 rounded-lg shadow-sm">
-                <div className="truncate">
-                  <span className="block text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Tautan Google Drive (Aset Dokumen/Desain/Source Code)</span>
-                  <a 
-                    href={project.driveLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-xs sm:text-sm text-[var(--color-brand-blue)] font-medium hover:underline truncate block mt-0.5"
-                  >
-                    {project.driveLink}
-                  </a>
-                </div>
-                <a 
-                  href={project.driveLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary py-2 px-4 text-xs flex items-center justify-center gap-1.5 shrink-0"
-                >
-                  Buka & Tinjau Aset
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              </div>
-            </div>
-
-            {/* Digital Footprint Log / Autopsy */}
-            {isApproved && project.securityLog && (
-              <div className="space-y-3 bg-emerald-50/50 border border-[var(--color-success-border)] rounded-lg p-5">
-                <h3 className="text-sm font-bold uppercase text-[var(--color-success-emerald)] flex items-center gap-2 border-b border-[var(--color-success-border)] pb-2">
-                  <Fingerprint className="h-4.5 w-4.5" />
-                  Digital Footprint Autopsy (Log Keamanan Legal)
-                </h3>
-
-                <div className="grid gap-3 sm:grid-cols-2 text-xs text-[var(--color-text-secondary)] mt-3">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-[var(--color-text-muted)] shrink-0" />
-                    <span>IP Address: <strong>{project.securityLog.ipAddress}</strong></span>
+              <div className="p-6 sm:p-8 space-y-6">
+                
+                {/* Deklarasi Resmi */}
+                <div className="flex justify-center">
+                  <div className="inline-flex items-center gap-2 bg-emerald-50 text-[var(--color-success-emerald)] px-6 py-3 rounded-full border-2 border-[var(--color-success-border)] font-extrabold text-xs sm:text-sm uppercase tracking-widest shadow-sm">
+                    <ShieldCheck className="h-5 w-5" />
+                    Dokumen Ini Asli & Terverifikasi Legal
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-[var(--color-text-muted)] shrink-0" />
-                    <span>Waktu Setuju: <strong>{new Date(project.securityLog.timestamp).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })} WIB</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Monitor className="h-4 w-4 text-[var(--color-text-muted)] shrink-0" />
-                    <span>Resolusi Layar: <strong>{project.securityLog.screenResolution}</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-[var(--color-success-emerald)] shrink-0" />
-                    <span>Timezone: <strong>{project.securityLog.timezone}</strong></span>
-                  </div>
-                  <div className="sm:col-span-2 border-t border-[var(--color-success-border)] pt-2.5 mt-1 flex gap-2">
-                    <Fingerprint className="h-4 w-4 text-[var(--color-success-emerald)] shrink-0 mt-0.5" />
-                    <div className="leading-relaxed">
-                      <span className="block font-semibold text-[var(--color-brand-navy)] text-[10px] uppercase">User Agent Perangkat Klien</span>
-                      <span className="font-mono text-[9px] text-[var(--color-text-secondary)] break-all">{project.securityLog.userAgent}</span>
+                </div>
+
+                <p className="text-xs text-center text-[var(--color-text-secondary)] max-w-lg mx-auto leading-relaxed">
+                  Menyatakan secara hukum bahwa seluruh hasil pekerjaan di bawah ini telah diserahkan secara digital oleh Pihak Pertama (Freelancer) dan disetujui tanpa syarat oleh Pihak Kedua (Klien) melalui persetujuan elektronik yang sah.
+                </p>
+
+                {/* Rincian Read-Only */}
+                <div className="space-y-4 pt-4 border-t border-[var(--color-border-subtle)]">
+                  <h3 className="text-sm font-bold uppercase text-[var(--color-text-secondary)] tracking-wider">
+                    Rincian Aset & Hubungan Hukum
+                  </h3>
+
+                  <div className="grid gap-5 sm:grid-cols-2 text-sm bg-[var(--color-bg-base)] p-5 rounded-lg border border-[var(--color-border-subtle)] shadow-inner">
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Nama Proyek</span>
+                      <span className="font-extrabold text-[var(--color-brand-navy)] text-base">{project.projectName}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Pihak Kedua (Klien)</span>
+                      <span className="font-extrabold text-[var(--color-brand-navy)] text-base">{project.clientName}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Pihak Pertama (Freelancer)</span>
+                      <span className="font-extrabold text-emerald-600 flex items-center gap-1">
+                        Terverifikasi Digital
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                      </span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Tanggal Terbit BAST</span>
+                      <span className="font-bold text-[var(--color-brand-navy)]">{new Date(project.createdAt).toLocaleDateString('id-ID', { dateStyle: 'long' })}</span>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="block text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Deskripsi Lingkup Pekerjaan</span>
+                      <p className="text-xs text-[var(--color-text-secondary)] bg-white p-3 rounded border border-[var(--color-border-subtle)] mt-1 whitespace-pre-line leading-relaxed">
+                        {project.description}
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* Approval / Download Action Area */}
-            <div className="border-t border-[var(--color-border-subtle)] pt-6 mt-6 flex flex-col items-center justify-center gap-4">
-              {isApproved ? (
-                <div className="text-center w-full space-y-4">
-                  <div className="inline-flex items-center gap-2 text-sm text-[var(--color-success-emerald)] bg-emerald-50 px-4 py-2 rounded border border-[var(--color-success-border)] font-bold">
-                    <FileCheck2 className="h-5 w-5" />
-                    Persetujuan Anda Berhasil Tercatat
+                {/* Google Drive Link Aset Final - Locked & Safe */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold uppercase text-[var(--color-text-secondary)] tracking-wider">
+                    Aset Final Terkunci (Transit Brankas)
+                  </h3>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-emerald-50/30 border border-[var(--color-success-border)] p-4 rounded-lg">
+                    <div className="truncate">
+                      <span className="block text-[10px] font-bold uppercase text-emerald-700">Tautan Unduh Aset Final (Read-Only State)</span>
+                      <a 
+                        href={project.driveLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-xs sm:text-sm text-[var(--color-brand-blue)] font-bold hover:underline truncate block mt-0.5"
+                      >
+                        {project.driveLink}
+                      </a>
+                    </div>
+                    <a 
+                      href={project.driveLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-success py-2 px-5 text-xs flex items-center justify-center gap-1.5 shrink-0"
+                    >
+                      Unduh Aset Final
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
                   </div>
-                  <p className="text-xs text-[var(--color-text-secondary)] max-w-md mx-auto">
-                    Berita Acara ini telah sah ditandatangani secara elektronik. Anda dan freelancer dapat mengunduh dokumen resmi ber-QR Code di bawah ini.
+                </div>
+
+                {/* Digital Footprint Autopsy - Transparent Log */}
+                {project.securityLog && (
+                  <div className="space-y-3 bg-slate-900 text-slate-100 rounded-lg p-5 border border-slate-800 shadow-md">
+                    <h3 className="text-xs font-bold uppercase text-emerald-400 flex items-center gap-2 border-b border-slate-800 pb-2 tracking-widest">
+                      <Fingerprint className="h-4.5 w-4.5 animate-pulse text-emerald-400" />
+                      Digital Footprint Autopsy (Audit Log UU ITE)
+                    </h3>
+
+                    <div className="grid gap-4 sm:grid-cols-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-slate-400 shrink-0" />
+                        <span>IP Address: <strong className="text-white font-mono">{project.securityLog.ipAddress}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-slate-400 shrink-0" />
+                        <span>Timestamp Persetujuan: <strong className="text-white">{new Date(project.securityLog.timestamp).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'medium' })} WIB</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Monitor className="h-4 w-4 text-slate-400 shrink-0" />
+                        <span>Resolusi Monitor: <strong className="text-white font-mono">{project.securityLog.screenResolution}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+                        <span>Status Keabsahan: <strong className="text-emerald-400 font-bold uppercase">APPROVED & SAH</strong></span>
+                      </div>
+                      
+                      <div className="sm:col-span-2 border-t border-slate-800 pt-3 mt-1 flex gap-2.5">
+                        <Fingerprint className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <div className="leading-relaxed">
+                          <span className="block font-semibold text-slate-400 text-[10px] uppercase tracking-wider">Fingerprint User Agent Perangkat Klien</span>
+                          <span className="font-mono text-[9px] text-slate-300 break-all">{project.securityLog.userAgent}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* PDF BAST Download */}
+                <div className="border-t border-[var(--color-border-subtle)] pt-6 mt-6 flex flex-col items-center justify-center gap-3">
+                  <p className="text-xs text-[var(--color-text-secondary)] text-center max-w-md">
+                    Dokumen Berita Acara Serah Terima (BAST) fisik/digital berformat PDF resmi dapat diunduh di bawah ini.
                   </p>
-                  
                   <a 
                     href={`/api/projects/${project.id}/pdf`}
-                    className="btn-success py-3.5 px-8 w-full sm:w-auto text-base"
+                    className="btn-success py-3 px-8 w-full sm:w-auto text-sm"
                   >
-                    <Download className="h-5 w-5" />
+                    <Download className="h-4.5 w-4.5" />
                     Unduh Dokumen BAST Sah (PDF)
                   </a>
                 </div>
-              ) : (
-                <div className="text-center w-full space-y-4">
-                  <p className="text-xs text-[var(--color-text-secondary)] max-w-lg mx-auto">
+
+              </div>
+            </>
+          ) : (
+            /* ==========================================
+               PENDING VIEW: HALAMAN PERSETUJUAN KLIEN
+               ========================================== */
+            <>
+              <div className="bg-[var(--color-brand-navy)] text-white p-6 text-center">
+                <Clock className="mx-auto h-12 w-12 text-blue-300 mb-2" />
+                <h2 className="text-xl font-bold uppercase tracking-wide">Konfirmasi Serah Terima Pekerjaan</h2>
+                <p className="text-xs text-slate-300 mt-1">
+                  Harap tinjau pekerjaan di bawah sebelum melakukan tanda tangan elektronik implisit.
+                </p>
+              </div>
+
+              <div className="p-6 sm:p-8 space-y-6">
+                <div className="flex gap-3 bg-[var(--color-brand-blue-light)] border border-blue-200 text-[var(--color-brand-blue)] p-4 rounded-lg text-xs leading-relaxed">
+                  <Info className="h-5 w-5 shrink-0" />
+                  <div>
+                    <strong>PENTING UNTUK KLIEN:</strong> Menekan tombol <strong>"Setuju & Selesaikan Proyek"</strong> di bagian bawah halaman ini merupakan wujud <strong>Tanda Tangan Elektronik Implisit yang Sah (UU ITE)</strong>. Setelah disetujui, data akan dikunci secara permanen, dan revisi di luar kesepakatan awal tidak dapat diajukan lagi secara gratis.
+                  </div>
+                </div>
+
+                {/* Project Summary */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold uppercase text-[var(--color-text-secondary)] border-b border-[var(--color-border-subtle)] pb-2">
+                    Detail Berita Acara Serah Terima (BAST)
+                  </h3>
+
+                  <div className="grid gap-4 sm:grid-cols-2 text-sm">
+                    <div>
+                      <span className="block text-xs font-semibold text-[var(--color-text-muted)]">Nama Proyek</span>
+                      <span className="font-bold text-[var(--color-brand-navy)]">{project.projectName}</span>
+                    </div>
+                    <div>
+                      <span className="block text-xs font-semibold text-[var(--color-text-muted)]">Pihak Kedua (Klien)</span>
+                      <span className="font-bold text-[var(--color-brand-navy)]">{project.clientName}</span>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="block text-xs font-semibold text-[var(--color-text-muted)]">Deskripsi Serah Terima Pekerjaan</span>
+                      <p className="text-xs text-[var(--color-text-secondary)] bg-[var(--color-bg-base)] p-3 rounded border border-[var(--color-border-subtle)] mt-1 whitespace-pre-line leading-relaxed">
+                        {project.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Aset Final Link */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold uppercase text-[var(--color-text-secondary)] border-b border-[var(--color-border-subtle)] pb-2">
+                    Aset Final Pekerjaan
+                  </h3>
+                  
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-[var(--color-bg-base)] border border-[var(--color-border-subtle)] p-4 rounded-lg shadow-sm">
+                    <div className="truncate">
+                      <span className="block text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Tautan Google Drive (Aset Dokumen/Desain/Source Code)</span>
+                      <a 
+                        href={project.driveLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-xs sm:text-sm text-[var(--color-brand-blue)] font-medium hover:underline truncate block mt-0.5"
+                      >
+                        {project.driveLink}
+                      </a>
+                    </div>
+                    <a 
+                      href={project.driveLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary py-2 px-4 text-xs flex items-center justify-center gap-1.5 shrink-0"
+                    >
+                      Buka & Tinjau Aset
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Approval Action Area */}
+                <div className="border-t border-[var(--color-border-subtle)] pt-6 mt-6 flex flex-col items-center justify-center gap-4">
+                  <p className="text-xs text-[var(--color-text-secondary)] max-w-lg text-center mx-auto">
                     Dengan mengklik tombol hijau di bawah, Anda secara sadar menyatakan <strong>SETUJU</strong> bahwa hasil pekerjaan telah selesai sesuai dengan deskripsi proyek di atas dan aset final yang dicantumkan telah Anda terima sepenuhnya.
                   </p>
                   
@@ -330,10 +410,9 @@ export default function VerifyClient() {
                     Tanda Tangan Elektronik Implisit Dilindungi UU ITE Republik Indonesia
                   </div>
                 </div>
-              )}
-            </div>
-
-          </div>
+              </div>
+            </>
+          )}
 
         </div>
 
