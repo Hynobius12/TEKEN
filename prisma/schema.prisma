@@ -1,0 +1,31 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id             String       @id
+  projectName    String
+  clientName     String
+  description    String
+  driveLink      String
+  status         String       @default("PENDING") // PENDING, APPROVED
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  securityLog    SecurityLog? // Relasi one-to-one dengan log audit digital footprint
+}
+
+model SecurityLog {
+  id               String   @id @default(uuid())
+  projectId        String   @unique
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ipAddress        String
+  userAgent        String
+  timezone         String
+  screenResolution String
+  timestamp        DateTime @default(now())
+}
